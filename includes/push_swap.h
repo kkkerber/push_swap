@@ -6,7 +6,7 @@
 /*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/07/21 18:47:24 by maryl             #+#    #+#             */
-/*   Updated: 2026/07/21 18:54:21 by maryl            ###   ########.fr       */
+/*   Updated: 2026/07/23 21:44:11 by maryl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,7 @@
 typedef struct s_node
 {
 	int				value;
-	int				index;
+	int				rank;
 	struct s_node	*next;
 	struct s_node	*prev;
 }	t_node;
