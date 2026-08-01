@@ -1,20 +1,9 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   push_swap.h                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/21 18:47:24 by maryl             #+#    #+#             */
-/*   Updated: 2026/07/23 21:44:11 by maryl            ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
 # include <stdlib.h>
 # include <unistd.h>
+# include "ft_printf.h"
 
 typedef struct s_node
 {
@@ -24,18 +13,19 @@ typedef struct s_node
 	struct s_node	*prev;
 }	t_node;
 
+typedef struct s_data
+{
+	t_node	*a;
+	t_node	*b;
+}	t_data;
+
 typedef struct s_stack
 {
 	t_node	*top;
 	t_node	*bottom;
 	int		size;
-}	t_stack;
-//container of the state of program, need to add more states later
-typedef struct s_data
-{
-	t_stack	*a;
-	t_stack	*b;
-}	t_data;
+} t_stack;
+
 
 t_node	*node_new(int value);
 void	stack_add_back(t_node **stack, t_node *new_node);
