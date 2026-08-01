@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   push_swap.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/01 17:25:55 by maliuten          #+#    #+#             */
+/*   Updated: 2026/08/01 17:26:41 by maliuten         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PUSH_SWAP_H
 # define PUSH_SWAP_H
 
@@ -13,30 +25,30 @@ typedef struct s_node
 	struct s_node	*prev;
 }	t_node;
 
-typedef struct s_data
-{
-	t_node	*a;
-	t_node	*b;
-}	t_data;
-
 typedef struct s_stack
 {
 	t_node	*top;
 	t_node	*bottom;
 	int		size;
-} t_stack;
+}	t_stack;
 
+typedef struct s_data
+{
+	t_stack	a;
+	t_stack	b;
+}	t_data;
+
+/* Stack management */
 
 t_node	*node_new(int value);
-void	stack_add_back(t_node **stack, t_node *new_node);
-t_node	*stack_last(t_node *stack);
-size_t	stack_size(t_node *stack);
-void	stack_clear(t_node **stack);
+void	stack_init(t_stack *stack);
+void	stack_add_top(t_stack *stack, t_node *node);
+void	stack_add_bottom(t_stack *stack, t_node *node);
+t_node	*stack_take_top(t_stack *stack);
+void	stack_clear(t_stack *stack);
+int		stack_is_sorted(t_stack *stack);
 
-void	swap_stack(t_node **stack);
-void	push_stack(t_node **dst, t_node **src);
-void	rotate_stack(t_node **stack);
-void	reverse_rotate_stack(t_node **stack);
+/* Push_swap commands */
 
 void	sa(t_data *data);
 void	sb(t_data *data);
