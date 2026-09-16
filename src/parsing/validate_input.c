@@ -1,22 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   stack_init.c                                       :+:      :+:    :+:   */
+/*   validate_input.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: vakhapil <vakhapil@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/01 17:40:13 by maliuten          #+#    #+#             */
-/*   Updated: 2026/08/01 17:48:06 by maliuten         ###   ########.fr       */
+/*   Created: 2026/09/16 19:00:00 by vakhapil          #+#    #+#             */
+/*   Updated: 2026/09/16 19:00:00 by vakhapil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "push_swap.h"
+#include "parsing.h"
 
-void	stack_init(t_stack *stack)
+int	validate_input(const int *values, int count)
 {
-	if (stack == NULL)
-		return ;
-	stack->top = NULL;
-	stack->bottom = NULL;
-	stack->size = 0;
+	int	i;
+	int	j;
+
+	i = 0;
+	while (i < count)
+	{
+		j = i + 1;
+		while (j < count)
+		{
+			if (values[i] == values[j])
+				return (0);
+			j++;
+		}
+		i++;
+	}
+	return (1);
 }
