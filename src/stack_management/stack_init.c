@@ -6,7 +6,7 @@
 /*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/01 17:40:13 by maliuten          #+#    #+#             */
-/*   Updated: 2026/08/01 17:48:06 by maliuten         ###   ########.fr       */
+/*   Updated: 2026/09/16 18:35:44 by maliuten         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,5 +19,5 @@ void	stack_init(t_stack *stack)
 	stack->top = NULL;
 	stack->bottom = NULL;
 	stack->size = 0;
-	return(stack);
+	return	;
 }
