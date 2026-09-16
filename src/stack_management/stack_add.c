@@ -6,9 +6,13 @@
 /*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/01 17:48:47 by maliuten          #+#    #+#             */
-/*   Updated: 2026/08/01 17:52:46 by maliuten         ###   ########.fr       */
+/*   Updated: 2026/09/16 18:12:12 by maliuten         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
+void	stack_add_top(t_stack *stack)
+{
+
+}
