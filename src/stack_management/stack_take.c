@@ -6,7 +6,7 @@
 /*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/10/05 10:40:24 by maryl             #+#    #+#             */
-/*   Updated: 2026/10/05 11:05:27 by maryl            ###   ########.fr       */
+/*   Updated: 2026/10/06 10:27:00 by maryl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@ t_node	*stack_take_top(t_stack *stack)
     t_node  *new_top;
 
     if (!stack || stack->size == 0)
-        return ;
+        return (NULL);
     node = stack->top;
     if (stack->size == 1)
     {
@@ -27,7 +27,7 @@ t_node	*stack_take_top(t_stack *stack)
         stack->size = 0;
         node->next = NULL;
         node->prev = NULL;
-        return ;
+        return (NULL);
     }
     new_top = node->next;
     stack->top = new_top;
