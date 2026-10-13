@@ -213,6 +213,7 @@ def main():
     sources += sorted((ROOT / "src/stack").glob("*.c"))
     sources += sorted((ROOT / "src/core").glob("*.c"))
     sources += sorted((ROOT / "src/ranking").glob("*.c"))
+    sources += sorted((ROOT / "src/analysis").glob("*.c"))
     flags = ["cc", "-Wall", "-Wextra", "-Werror", "-g",
              "-I", str(ROOT / "includes"), "-I", str(ROOT / "ft_printf")]
     if not options.valgrind:
