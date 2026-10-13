@@ -3,14 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/07/21 18:53:25 by maryl             #+#    #+#             */
-/*   Updated: 2026/07/21 18:53:41 by maryl            ###   ########.fr       */
+/*   Created: 2026/08/01 16:15:27 by maliuten          #+#    #+#             */
+/*   Updated: 2026/08/01 16:46:24 by maliuten         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "push_swap.h"
+
 int	main(void)
 {
+	t_data	data;
+
+	data_init(&data);
+	data_clear(&data);
 	return (0);
 }
