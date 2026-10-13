@@ -3,10 +3,23 @@
 /*                                                        :::      ::::::::   */
 /*   swap.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
+/*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/01 16:10:01 by maliuten          #+#    #+#             */
-/*   Updated: 2026/08/01 16:10:07 by maliuten         ###   ########.fr       */
+/*   Updated: 2026/10/13 17:54:53 by maryl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "push_swap.h"
+
+void	sa(t_data *data)
+{
+    t_stack a;
+    t_node  *node;
+
+    data->a = a;
+    if (a.size < 2)
+        return ;
+    stack_take_top(&a);
+    
+}
