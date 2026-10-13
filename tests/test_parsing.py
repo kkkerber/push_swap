@@ -212,6 +212,7 @@ def main():
     sources = sorted((ROOT / "src/parsing").glob("*.c"))
     sources += sorted((ROOT / "src/stack").glob("*.c"))
     sources += sorted((ROOT / "src/core").glob("*.c"))
+    sources += sorted((ROOT / "src/ranking").glob("*.c"))
     flags = ["cc", "-Wall", "-Wextra", "-Werror", "-g",
              "-I", str(ROOT / "includes"), "-I", str(ROOT / "ft_printf")]
     if not options.valgrind:
@@ -248,9 +249,13 @@ def main():
         expected = [1, 1, len(values), *values]
         check(binary, failure_args, expected, memory=options.valgrind,
               fail_at=len(values) + 1)
+        # Main owns one additional temporary array during ranking.
+        check(app, failure_args, None, memory=options.valgrind,
+              fail_at=len(values) + 1, app=True)
     mode = "Valgrind" if options.valgrind else "ASan/UBSan"
     print(f"PASS: {len(cases)} cases for parser/stack and main; "
-          f"17 allocation failure positions; {mode}; allocation balance, "
+          f"17 parser allocation failure positions plus ranking failure; {mode}; "
+          "allocation balance, "
           "order, circular links, flags and exact error output")
 
 

@@ -17,7 +17,12 @@ stack directly and prints/counts once. Push moves existing nodes without
 allocation or freeing. Stage 4 rotations (`ra`, `rb`, `rr`, `rra`, `rrb`, `rrr`)
 are also implemented with direct output and counters. Stage 5 parses and
 validates CLI arguments, then builds stack A in input order with B empty.
-Ranking, sorting and benchmark output are not implemented yet: valid inputs
+Stage 6 assigns ranks after parsing: the minimum receives 0 and the maximum
+receives n - 1. It sorts a temporary copy using insertion sort, checks adjacent
+duplicates, then finds each node value in that copy. Values, node order and
+circular links stay unchanged. Ranking takes O(n²) time and O(n) temporary
+space; allocation failure or duplicates leave ranks untouched.
+Sorting the stacks and benchmark output are not implemented yet: valid inputs
 currently produce no output, invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -34,7 +39,10 @@ Run `python3 tests/test_rotations.py` for Stage 4 checks with ASan/UBSan, or
 `python3 tests/test_rotations.py --valgrind` for Valgrind memory checks.
 Run `python3 tests/test_parsing.py` for Stage 5 parser, stack construction and
 main checks with ASan/UBSan, or add `--valgrind` for Valgrind checks. These tests
-also force failure of the values array and each allocation in a 16-node stack.
+also force failure of the values array, each allocation in a 16-node stack,
+and the ranking array used by main.
+Run `python3 tests/test_ranking.py` for Stage 6 ranks, integer boundaries,
+duplicate/allocation failure, unchanged nodes and links, UBSan and Valgrind.
 
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
@@ -59,4 +67,6 @@ existing stack primitives and direct per-command output/counters.
 Stage 5 reuses the standalone parser from `origin/feature/parsing` (`ffdc674`);
 AI assistance adapted its configuration types, integrated stack construction
 and added portable allocation-failure and CLI regression checks.
+AI assistance implemented Stage 6 ranking, explained the temporary-array
+approach and added rank, ownership and allocation-failure regression tests.
 The learners should review and explain these changes before merging.
