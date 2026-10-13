@@ -90,6 +90,11 @@ t_node	*stack_take_top(t_stack *stack);
 void	stack_clear(t_stack *stack);
 int		stack_is_sorted(t_stack *stack);
 
+/* Ranking: sort_values requires an array of size integers. */
+
+void	sort_values(int *values, int size);
+int		assign_ranks(t_stack *stack);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);

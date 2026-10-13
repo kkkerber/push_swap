@@ -17,7 +17,7 @@ int	main(int argc, char **argv)
 	t_data	data;
 
 	data_init(&data);
-	if (!parse_input(argc, argv, &data))
+	if (!parse_input(argc, argv, &data) || !assign_ranks(&data.a))
 		return (error(&data));
 	data_clear(&data);
 	return (0);
