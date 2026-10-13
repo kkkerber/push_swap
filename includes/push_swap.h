@@ -100,6 +100,10 @@ int		assign_ranks(t_stack *stack);
 void	compute_disorder(t_data *data);
 void	strategy_select(t_data *data);
 
+/* Small sort: assigned ranks, at most five nodes in A, empty B. */
+
+void	sort_small(t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);
