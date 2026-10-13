@@ -10,7 +10,9 @@ Nodes start detached with rank -1. Taking a node transfers ownership to the
 caller; clearing a stack frees its nodes. Initialize data before using or
 clearing it, including after a partially completed stack construction.
 
-Commands, parsing, ranking, sorting and benchmark output are not implemented.
+Stage 4 rotations (`ra`, `rb`, `rr`, `rra`, `rrb`, `rrr`) are implemented with
+operation output and statistics. Swap/push commands, parsing, ranking, sorting
+and benchmark output are not implemented.
 The current executable initializes and clears its context without output.
 
 ## Instructions
@@ -20,6 +22,8 @@ Run `make clean`, `make fclean` or `make re` for build cleanup/rebuild.
 The existing ft_printf library is built and linked through its own Makefile.
 Run `python3 tests/test_foundation.py` for stack and lifecycle tests, including
 Valgrind memory checks. The tests require Python 3, cc and Valgrind.
+Run `python3 tests/test_rotations.py` for Stage 4 checks with ASan/UBSan, or
+`python3 tests/test_rotations.py --valgrind` for Valgrind memory checks.
 
 ## Resources
 
