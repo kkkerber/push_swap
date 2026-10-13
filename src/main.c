@@ -10,13 +10,15 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "push_swap.h"
+#include "parsing.h"
 
-int	main(void)
+int	main(int argc, char **argv)
 {
 	t_data	data;
 
 	data_init(&data);
+	if (!parse_input(argc, argv, &data))
+		return (error(&data));
 	data_clear(&data);
 	return (0);
 }

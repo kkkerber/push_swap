@@ -15,9 +15,10 @@ command changes the stacks, prints its name immediately and updates its own
 counter and the total. No-ops print and count nothing. `ss` changes each eligible
 stack directly and prints/counts once. Push moves existing nodes without
 allocation or freeing. Stage 4 rotations (`ra`, `rb`, `rr`, `rra`, `rrb`, `rrr`)
-are also implemented with direct output and counters. Parsing, ranking, sorting
-and benchmark output are not implemented.
-The current executable initializes and clears its context without output.
+are also implemented with direct output and counters. Stage 5 parses and
+validates CLI arguments, then builds stack A in input order with B empty.
+Ranking, sorting and benchmark output are not implemented yet: valid inputs
+currently produce no output, invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
 
@@ -31,6 +32,17 @@ links, ownership and unchanged values/ranks. The tests require Python 3, cc
 and Valgrind.
 Run `python3 tests/test_rotations.py` for Stage 4 checks with ASan/UBSan, or
 `python3 tests/test_rotations.py --valgrind` for Valgrind memory checks.
+Run `python3 tests/test_parsing.py` for Stage 5 parser, stack construction and
+main checks with ASan/UBSan, or add `--valgrind` for Valgrind checks. These tests
+also force failure of the values array and each allocation in a 16-node stack.
+
+CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
+(`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
+one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
+one `--bench`. Flags occupy separate arguments and can appear before or after
+numbers. Strategy and benchmark flags are stored for the later sorting stages.
+Empty strings, whitespace-only arguments, malformed integers, overflow, numeric
+duplicates, unknown/repeated flags and flags without numbers are rejected.
 
 ## Resources
 
@@ -44,4 +56,7 @@ code was retained; AI assistance helped prepare the Stage 1/2 lifecycle,
 correct singleton extraction, normalize formatting and add regression tests.
 AI assistance also implemented and tested the Stage 3 commands using the
 existing stack primitives and direct per-command output/counters.
+Stage 5 reuses the standalone parser from `origin/feature/parsing` (`ffdc674`);
+AI assistance adapted its configuration types, integrated stack construction
+and added portable allocation-failure and CLI regression checks.
 The learners should review and explain these changes before merging.
