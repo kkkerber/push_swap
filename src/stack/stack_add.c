@@ -15,8 +15,7 @@
 void	stack_add_top(t_stack *stack, t_node *node)
 {
 	if (stack == NULL || node == NULL)
-		return	;
-		
+		return ;
 	if (stack->size == 0)
 	{
 		node->next = node;
@@ -24,19 +23,20 @@ void	stack_add_top(t_stack *stack, t_node *node)
 		stack->top = node;
 		stack->bottom = node;
 		stack->size = 1;
-		return	;
+		return ;
 	}
 	node->next = stack->top;
 	node->prev = stack->bottom;
 	stack->bottom->next = node;
 	stack->top->prev = node;
 	stack->top = node;
-	stack->size++;	
+	stack->size++;
 }
+
 void	stack_add_bottom(t_stack *stack, t_node *node)
 {
 	if (!stack || !node)
-		return	;
+		return ;
 	if (stack->size == 0)
 	{
 		node->next = node;

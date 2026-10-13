@@ -1,25 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   swap.c                                             :+:      :+:    :+:   */
+/*   stack_state.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/08/01 16:10:01 by maliuten          #+#    #+#             */
-/*   Updated: 2026/10/13 17:54:53 by maryl            ###   ########.fr       */
+/*   Created: 2026/10/05 11:23:40 by maryl             #+#    #+#             */
+/*   Updated: 2026/10/06 09:39:25 by maryl            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-void	sa(t_data *data)
+int	stack_is_sorted(t_stack *stack)
 {
-    t_stack a;
-    t_node  *node;
+	t_node	*current;
+	int		i;
 
-    data->a = a;
-    if (a.size < 2)
-        return ;
-    stack_take_top(&a);
-    
+	if (!stack || stack->size < 2)
+		return (1);
+	current = stack->top;
+	i = stack->size - 1;
+	while (i > 0)
+	{
+		if (current->value > current->next->value)
+			return (0);
+		current = current->next;
+		i--;
+	}
+	return (1);
 }

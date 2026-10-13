@@ -14,27 +14,24 @@
 
 t_node	*stack_take_top(t_stack *stack)
 {
-    t_node  *node;
-    t_node  *new_top;
+	t_node	*node;
 
-    if (!stack || stack->size == 0)
-        return (NULL);
-    node = stack->top;
-    if (stack->size == 1)
-    {
-        stack->top = NULL;
-        stack->bottom = NULL;
-        stack->size = 0;
-        node->next = NULL;
-        node->prev = NULL;
-        return (NULL);
-    }
-    new_top = node->next;
-    stack->top = new_top;
-    stack->bottom->next = new_top;
-    new_top->prev = stack->bottom;
-    node->next = NULL;
-    node->prev = NULL;
-    stack->size--;
-    return (node);
+	if (!stack || stack->size == 0)
+		return (NULL);
+	node = stack->top;
+	if (stack->size == 1)
+	{
+		stack->top = NULL;
+		stack->bottom = NULL;
+	}
+	else
+	{
+		stack->top = node->next;
+		stack->bottom->next = stack->top;
+		stack->top->prev = stack->bottom;
+	}
+	stack->size--;
+	node->next = NULL;
+	node->prev = NULL;
+	return (node);
 }

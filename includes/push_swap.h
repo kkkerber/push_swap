@@ -32,11 +32,53 @@ typedef struct s_stack
 	int		size;
 }	t_stack;
 
+typedef enum e_strategy
+{
+	SIMPLE,
+	MEDIUM,
+	COMPLEX,
+	ADAPTIVE
+}	t_strategy;
+
+typedef struct s_config
+{
+	t_strategy	requested_strategy;
+	int			strategy_set;
+	int			bench;
+}	t_config;
+
+typedef struct s_stats
+{
+	unsigned long long	total;
+	unsigned long long	sa;
+	unsigned long long	sb;
+	unsigned long long	ss;
+	unsigned long long	pa;
+	unsigned long long	pb;
+	unsigned long long	ra;
+	unsigned long long	rb;
+	unsigned long long	rr;
+	unsigned long long	rra;
+	unsigned long long	rrb;
+	unsigned long long	rrr;
+}	t_stats;
+
 typedef struct s_data
 {
-	t_stack	a;
-	t_stack	b;
+	t_stack				a;
+	t_stack				b;
+	t_config			config;
+	t_stats				stats;
+	unsigned long long	inversions;
+	unsigned long long	pairs;
+	t_strategy			effective_strategy;
 }	t_data;
+
+/* Program lifecycle */
+
+void	data_init(t_data *data);
+void	data_clear(t_data *data);
+int		error(t_data *data);
 
 /* Stack management */
 

@@ -10,7 +10,13 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "push_swap.h"
+
 int	main(void)
 {
+	t_data	data;
+
+	data_init(&data);
+	data_clear(&data);
 	return (0);
 }

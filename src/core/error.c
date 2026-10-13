@@ -1,32 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   stack_state.c                                      :+:      :+:    :+:   */
+/*   error.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: maryl <maryl@student.42.fr>                +#+  +:+       +#+        */
+/*   By: maliuten <maliuten@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/10/05 11:23:40 by maryl             #+#    #+#             */
-/*   Updated: 2026/10/06 09:39:25 by maryl            ###   ########.fr       */
+/*   Created: 2026/08/01 16:15:27 by maliuten          #+#    #+#             */
+/*   Updated: 2026/08/01 16:46:24 by maliuten         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "push_swap.h"
 
-int	stack_is_sorted(t_stack *stack)
+int	error(t_data *data)
 {
-	t_node	*current;
-	int	i;
-
-	if (!stack || stack->size < 2)
-		return (1);
-	current = stack->top;
-	i = stack->size - 1;
-	while (i > 0)
-	{
-		if (current->value > current->next->value)
-			return (0);
-		current = current->next;
-		i--;
-	}
+	data_clear(data);
+	write(2, "Error\n", 6);
 	return (1);
 }
