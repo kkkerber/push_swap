@@ -21,6 +21,8 @@ int	main(int argc, char **argv)
 		return (error(&data));
 	compute_disorder(&data);
 	strategy_select(&data);
+	if (data.a.size <= 5)
+		sort_small(&data);
 	data_clear(&data);
 	return (0);
 }

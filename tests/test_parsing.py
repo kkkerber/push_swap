@@ -149,7 +149,14 @@ def check(binary, args, expected, *, memory=False, fail_at=None, app=False):
     else:
         assert result.returncode == 0 and not result.stderr, (args, result)
         if app:
-            assert result.stdout == "", (args, result)
+            values = expected[3:]
+            if len(values) <= 5:
+                from test_small import replay
+                assert replay(values, result.stdout) == (sorted(values), []), (args, result)
+                if values == sorted(values):
+                    assert result.stdout == "", (args, result)
+            else:
+                assert result.stdout == "", (args, result)
         else:
             assert list(map(int, result.stdout.split())) == expected, (args, result)
 
@@ -214,6 +221,9 @@ def main():
     sources += sorted((ROOT / "src/core").glob("*.c"))
     sources += sorted((ROOT / "src/ranking").glob("*.c"))
     sources += sorted((ROOT / "src/analysis").glob("*.c"))
+    sources += sorted((ROOT / "src/sorting").glob("*.c"))
+    sources += sorted((ROOT / "src/operations").glob("*.c"))
+    sources += sorted((ROOT / "ft_printf").glob("*.c"))
     flags = ["cc", "-Wall", "-Wextra", "-Werror", "-g",
              "-I", str(ROOT / "includes"), "-I", str(ROOT / "ft_printf")]
     if not options.valgrind:

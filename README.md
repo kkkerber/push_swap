@@ -28,8 +28,14 @@ and Complex from 50%. Empty/singleton input has zero disorder. Explicit selector
 are preserved; requested and effective strategies are stored separately.
 Threshold comparisons use integer ceilings without floating point or multiplying
 counters. Analysis takes O(n²) time and O(1) extra space.
-Sorting the stacks and benchmark output are not implemented yet: valid inputs
-currently produce no output, invalid inputs print `Error` to stderr and return 1.
+Stage 8 sorts inputs of up to five elements by rank using only public commands.
+For three nodes it moves the maximum to the bottom and swaps the first two if
+needed. For four/five it moves minima to B using shortest rotations, sorts three
+and returns the minima with pa. Already sorted input emits nothing.
+The small-sort API requires assigned ranks and empty B; unsupported sizes or a
+nonempty B are left untouched. Strategies for larger inputs and benchmark output
+are not implemented yet: larger valid inputs currently produce no operations.
+Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
 
@@ -52,6 +58,11 @@ duplicate/allocation failure, unchanged nodes and links, UBSan and Valgrind.
 
 Run `python3 tests/test_analysis.py` for Stage 7 pair counts, exhaustive small
 permutations, exact thresholds, explicit selectors, mutation and memory checks.
+
+Run `python3 tests/test_small.py` for all 152 permutations of sizes 2–5,
+per-command invariants, rank-only decisions, independent output replay and memory
+checks. Inputs up to five elements now emit sorting operations; all selectors
+share this small-sort base case.
 
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
@@ -80,4 +91,6 @@ AI assistance implemented Stage 6 ranking, explained the temporary-array
 approach and added rank, ownership and allocation-failure regression tests.
 AI assistance implemented Stage 7 inversion counting and integer strategy
 selection, explained the thresholds and added independent-model tests.
+AI assistance implemented Stage 8 small sort, explained the maximum/minimum
+steps and added exhaustive permutations and command-stream regression tests.
 The learners should review and explain these changes before merging.
