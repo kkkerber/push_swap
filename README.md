@@ -22,6 +22,12 @@ receives n - 1. It sorts a temporary copy using insertion sort, checks adjacent
 duplicates, then finds each node value in that copy. Values, node order and
 circular links stay unchanged. Ranking takes O(n²) time and O(n) temporary
 space; allocation failure or duplicates leave ranks untouched.
+Stage 7 counts original-input inversions and total pairs after ranking and before
+any operation. Adaptive selects Simple below 20%, Medium from 20% to below 50%,
+and Complex from 50%. Empty/singleton input has zero disorder. Explicit selectors
+are preserved; requested and effective strategies are stored separately.
+Threshold comparisons use integer ceilings without floating point or multiplying
+counters. Analysis takes O(n²) time and O(1) extra space.
 Sorting the stacks and benchmark output are not implemented yet: valid inputs
 currently produce no output, invalid inputs print `Error` to stderr and return 1.
 
@@ -43,6 +49,9 @@ also force failure of the values array, each allocation in a 16-node stack,
 and the ranking array used by main.
 Run `python3 tests/test_ranking.py` for Stage 6 ranks, integer boundaries,
 duplicate/allocation failure, unchanged nodes and links, UBSan and Valgrind.
+
+Run `python3 tests/test_analysis.py` for Stage 7 pair counts, exhaustive small
+permutations, exact thresholds, explicit selectors, mutation and memory checks.
 
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
@@ -69,4 +78,6 @@ AI assistance adapted its configuration types, integrated stack construction
 and added portable allocation-failure and CLI regression checks.
 AI assistance implemented Stage 6 ranking, explained the temporary-array
 approach and added rank, ownership and allocation-failure regression tests.
+AI assistance implemented Stage 7 inversion counting and integer strategy
+selection, explained the thresholds and added independent-model tests.
 The learners should review and explain these changes before merging.

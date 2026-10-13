@@ -95,6 +95,11 @@ int		stack_is_sorted(t_stack *stack);
 void	sort_values(int *values, int size);
 int		assign_ranks(t_stack *stack);
 
+/* Original-input analysis, before any Push_swap operation. */
+
+void	compute_disorder(t_data *data);
+void	strategy_select(t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);
