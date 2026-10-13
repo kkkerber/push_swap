@@ -150,7 +150,11 @@ def check(binary, args, expected, *, memory=False, fail_at=None, app=False):
         assert result.returncode == 0 and not result.stderr, (args, result)
         if app:
             values = expected[3:]
-            if len(values) <= 5:
+            inversions = sum(left > right for i, left in enumerate(values)
+                             for right in values[i + 1:])
+            pairs = len(values) * (len(values) - 1) // 2
+            simple = expected[0] == 0 or (expected[0] == 3 and inversions * 5 < pairs)
+            if len(values) <= 5 or simple:
                 from test_small import replay
                 assert replay(values, result.stdout) == (sorted(values), []), (args, result)
                 if values == sorted(values):

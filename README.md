@@ -33,8 +33,14 @@ For three nodes it moves the maximum to the bottom and swaps the first two if
 needed. For four/five it moves minima to B using shortest rotations, sorts three
 and returns the minima with pa. Already sorted input emits nothing.
 The small-sort API requires assigned ranks and empty B; unsupported sizes or a
-nonempty B are left untouched. Strategies for larger inputs and benchmark output
-are not implemented yet: larger valid inputs currently produce no operations.
+nonempty B are left untouched. Stage 9 implements Simple for arbitrary sizes:
+it finds the minimum rank, rotates it to the top by the shortest direction,
+pushes it to B and repeats, then restores all nodes with pa. Sizes up to five
+use the shared small sort. Simple uses O(n²) time/operations and O(1) extra space;
+it allocates/frees no nodes. `--simple` works at every disorder level. Adaptive
+uses it only below 20% disorder. Medium/Complex and benchmark output remain
+future stages; inputs larger than five assigned to those strategies currently
+produce no operations.
 Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -64,11 +70,16 @@ per-command invariants, rank-only decisions, independent output replay and memor
 checks. Inputs up to five elements now emit sorting operations; all selectors
 share this small-sort base case.
 
+Run `python3 tests/test_simple.py` for Simple at sizes through 1000, selector
+behavior, shortest rotations, rank-only sorting, counters, ownership and memory
+checks. For example: `./push_swap --simple "6 3 1 5 2 4"`.
+
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
 one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
 one `--bench`. Flags occupy separate arguments and can appear before or after
-numbers. Strategy and benchmark flags are stored for the later sorting stages.
+numbers. Strategy selection uses original-input disorder; benchmark output is
+not yet implemented.
 Empty strings, whitespace-only arguments, malformed integers, overflow, numeric
 duplicates, unknown/repeated flags and flags without numbers are rejected.
 
@@ -93,4 +104,6 @@ AI assistance implemented Stage 7 inversion counting and integer strategy
 selection, explained the thresholds and added independent-model tests.
 AI assistance implemented Stage 8 small sort, explained the maximum/minimum
 steps and added exhaustive permutations and command-stream regression tests.
+AI assistance implemented Stage 9 minimum extraction, shared rank search with
+small sort, and added arbitrary-size and selector regression tests.
 The learners should review and explain these changes before merging.

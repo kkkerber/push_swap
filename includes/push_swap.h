@@ -89,6 +89,7 @@ void	stack_add_bottom(t_stack *stack, t_node *node);
 t_node	*stack_take_top(t_stack *stack);
 void	stack_clear(t_stack *stack);
 int		stack_is_sorted(t_stack *stack);
+int		stack_min_rank_position(t_stack *stack);
 
 /* Ranking: sort_values requires an array of size integers. */
 
@@ -103,6 +104,10 @@ void	strategy_select(t_data *data);
 /* Small sort: assigned ranks, at most five nodes in A, empty B. */
 
 void	sort_small(t_data *data);
+
+/* Simple: assigned ranks and empty B; shared small sort for sizes <= 5. */
+
+void	sort_simple(t_data *data);
 
 /* Push_swap commands */
 
