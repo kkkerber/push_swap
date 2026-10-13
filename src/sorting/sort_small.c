@@ -46,35 +46,11 @@ static void	sort_three(t_data *data)
 		sa(data);
 }
 
-static int	minimum_position(t_stack *stack)
-{
-	t_node	*node;
-	int		minimum;
-	int		position;
-	int		i;
-
-	node = stack->top;
-	minimum = node->rank;
-	position = 0;
-	i = 0;
-	while (i < stack->size)
-	{
-		if (node->rank < minimum)
-		{
-			minimum = node->rank;
-			position = i;
-		}
-		node = node->next;
-		i++;
-	}
-	return (position);
-}
-
 static void	move_minimum(t_data *data)
 {
 	int	position;
 
-	position = minimum_position(&data->a);
+	position = stack_min_rank_position(&data->a);
 	if (position <= data->a.size / 2)
 	{
 		while (position > 0)

@@ -23,6 +23,8 @@ int	main(int argc, char **argv)
 	strategy_select(&data);
 	if (data.a.size <= 5)
 		sort_small(&data);
+	else if (data.effective_strategy == SIMPLE)
+		sort_simple(&data);
 	data_clear(&data);
 	return (0);
 }
