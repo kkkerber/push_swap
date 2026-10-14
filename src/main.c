@@ -20,15 +20,7 @@ int	main(int argc, char **argv)
 	if (!parse_input(argc, argv, &data) || !assign_ranks(&data.a))
 		return (error(&data));
 	compute_disorder(&data);
-	strategy_select(&data);
-	if (data.a.size <= 5)
-		sort_small(&data);
-	else if (data.effective_strategy == SIMPLE)
-		sort_simple(&data);
-	else if (data.effective_strategy == MEDIUM)
-		sort_medium(&data);
-	else if (data.effective_strategy == COMPLEX)
-		sort_complex(&data);
+	sort_dispatch(&data);
 	data_clear(&data);
 	return (0);
 }

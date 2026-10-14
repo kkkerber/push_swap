@@ -119,6 +119,11 @@ void	medium_restore(t_data *data);
 
 void	sort_complex(t_data *data);
 
+/* Routing: assigned dense ranks, empty B, original disorder computed. */
+
+void	sort_adaptive(t_data *data);
+void	sort_dispatch(t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);
