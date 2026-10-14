@@ -57,8 +57,21 @@ List searches can still take O(n²) CPU time; the subject measures complexity
 in generated commands. Medium needs O(1) extra space and no allocation/free.
 It requires dense assigned ranks 0..n-1 and empty B, and delegates sizes <= 5
 to small sort. `--medium` is preserved at every disorder level; Adaptive uses
-Medium from 20% to below 50%. Complex and benchmark output remain future stages;
-inputs larger than five assigned to Complex currently produce no operations.
+Medium from 20% to below 50%.
+
+Stage 11 implements Complex using binary LSD radix on ranks. The maximum rank
+determines the number of bit passes. Each pass processes exactly the initial
+size of A: zero bits move to B with pb, one bits rotate A with ra. Returning
+all of B with pa restores the order of the zero-bit group, so each pass is
+stable. The next pass sorts by the next more significant bit.
+For dense ranks 0..n-1, there are ceil(log2(n)) passes, each using at most 2n
+commands: O(n log n) time/commands and O(1) extra space for the sorting phase.
+Ranking and disorder preprocessing retain their separate O(n²) time costs.
+Complex allocates/frees no nodes, preserves values/ranks and delegates sizes
+up to five to small sort. Sorted input emits nothing. Explicit `--complex`
+always selects Complex; Adaptive selects it at disorder >= 50%.
+All strategies are now connected in main. The dedicated Adaptive/dispatcher
+modules (Stage 12) and benchmark output (Stage 13) remain future work.
 Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -99,6 +112,15 @@ to use Valgrind instead. The test also checks 100 random 100-element inputs
 below 1500 commands and 50 random 500-element inputs below 8000 commands.
 For example: `./push_swap --medium "6 3 1 5 2 4"`.
 
+Run `python3 tests/test_complex.py` for all permutations of sizes 0–6, exact
+radix command sequences, power-of-two boundaries, patterns through 1500,
+rank-only decisions, per-command links/ownership/counters and allocation guards
+with ASan/UBSan. Add `--valgrind` to use Valgrind instead. A standalone probe
+also checks sparse nonnegative ranks through INT_MAX to verify dynamic bit
+counting. The CLI still assigns dense ranks. Twenty random inputs at each of
+100 and 500 elements use 1084 and 6784 commands respectively.
+For example: `./push_swap --complex "6 3 1 5 2 4"`.
+
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
 one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
@@ -133,4 +155,6 @@ AI assistance implemented Stage 9 minimum extraction, shared rank search with
 small sort, and added arbitrary-size and selector regression tests.
 AI assistance implemented Stage 10 dynamic chunks and combined rotations,
 documented the command-count bound and added Medium regression tests.
+AI assistance implemented Stage 11 radix sorting and CLI integration, reused
+the Medium invariant probe and added exact-model and bit-boundary tests.
 The learners should review and explain these changes before merging.
