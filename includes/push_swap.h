@@ -115,6 +115,10 @@ void	sort_medium(t_data *data);
 void	medium_push_chunk(t_data *data, int limit, int middle);
 void	medium_restore(t_data *data);
 
+/* Complex: assigned nonnegative ranks, empty B; small sort for sizes <= 5. */
+
+void	sort_complex(t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);
