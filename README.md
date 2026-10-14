@@ -70,8 +70,17 @@ Ranking and disorder preprocessing retain their separate O(n²) time costs.
 Complex allocates/frees no nodes, preserves values/ranks and delegates sizes
 up to five to small sort. Sorted input emits nothing. Explicit `--complex`
 always selects Complex; Adaptive selects it at disorder >= 50%.
-All strategies are now connected in main. The dedicated Adaptive/dispatcher
-modules (Stage 12) and benchmark output (Stage 13) remain future work.
+Stage 12 centralizes sorting in `sort_dispatch`, called by main after ranking
+and original-input disorder analysis. The dispatcher records the effective
+strategy before returning for empty or sorted input, delegates sizes <= 5 to
+small sort, and preserves explicit selectors. Adaptive calls `sort_adaptive`,
+which reuses Stage 7's integer threshold selection and runs the selected
+algorithm. Default input and explicit `--adaptive` follow the same path.
+Requested strategy, original inversions and total pairs remain unchanged;
+the effective strategy identifies the selected family even when small sort
+handles the input. Both entry points require assigned dense ranks, empty B
+and previously computed disorder. They allocate no memory; a nonempty B is
+left untouched. Benchmark output (Stage 13) remains future work.
 Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -121,6 +130,14 @@ counting. The CLI still assigns dense ranks. Twenty random inputs at each of
 100 and 500 elements use 1084 and 6784 commands respectively.
 For example: `./push_swap --complex "6 3 1 5 2 4"`.
 
+Run `python3 tests/test_dispatch.py` for Stage 12 selector routing, exact
+20%/50% boundaries and adjacent inversion counts, all permutations of sizes
+0–5 under every selector, and patterns through 1000 elements. Direct API
+checks preserve requested/effective strategies, original metrics, node
+identity, ranks, circular links and operation counters, including repeated
+sorting and nonempty-B guards. The suite uses ASan/UBSan by default; add
+`--valgrind` for Valgrind checks.
+
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
 one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
@@ -157,4 +174,6 @@ AI assistance implemented Stage 10 dynamic chunks and combined rotations,
 documented the command-count bound and added Medium regression tests.
 AI assistance implemented Stage 11 radix sorting and CLI integration, reused
 the Medium invariant probe and added exact-model and bit-boundary tests.
+AI assistance implemented Stage 12 Adaptive/dispatcher integration and added
+selector, threshold, metadata-preservation and direct API regression checks.
 The learners should review and explain these changes before merging.
