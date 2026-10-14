@@ -25,6 +25,8 @@ int	main(int argc, char **argv)
 		sort_small(&data);
 	else if (data.effective_strategy == SIMPLE)
 		sort_simple(&data);
+	else if (data.effective_strategy == MEDIUM)
+		sort_medium(&data);
 	data_clear(&data);
 	return (0);
 }

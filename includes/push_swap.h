@@ -109,6 +109,12 @@ void	sort_small(t_data *data);
 
 void	sort_simple(t_data *data);
 
+/* Medium: dense ranks 0..n-1 and empty B; helpers shared by its two files. */
+
+void	sort_medium(t_data *data);
+void	medium_push_chunk(t_data *data, int limit, int middle);
+void	medium_restore(t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);

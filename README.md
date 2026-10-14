@@ -38,9 +38,27 @@ it finds the minimum rank, rotates it to the top by the shortest direction,
 pushes it to B and repeats, then restores all nodes with pa. Sizes up to five
 use the shared small sort. Simple uses O(n²) time/operations and O(1) extra space;
 it allocates/frees no nodes. `--simple` works at every disorder level. Adaptive
-uses it only below 20% disorder. Medium/Complex and benchmark output remain
-future stages; inputs larger than five assigned to those strategies currently
-produce no operations.
+uses it only below 20% disorder.
+Stage 10 implements Medium with rank chunks of width floor(sqrt(n)), computed
+using integer division. It selects the first remaining rank in the current
+chunk in forward circular order and brings that node to the top using the
+shortest rotation direction. Lower ranks in the chunk are rotated deeper into
+B; higher ranks stay near the top. Pending rb is combined with forward A
+rotation as rr. For two nodes in B, reverse rotation has the same effect as rb,
+so it combines with reverse A rotation as rrr. Returning nodes always brings
+the maximum rank in B to the top by the shortest direction before pa.
+
+For width w, extracting each chunk needs at most one forward sweep of A;
+reverse shortcuts cannot cost more than that sweep. Extraction therefore uses
+O(n²/w) commands. Each chunk forms two blocks around the older contents of B;
+its maxima can be reached from either end within O(w) rotations, giving O(nw)
+return commands. With w = floor(sqrt(n)), the command count is O(n√n).
+List searches can still take O(n²) CPU time; the subject measures complexity
+in generated commands. Medium needs O(1) extra space and no allocation/free.
+It requires dense assigned ranks 0..n-1 and empty B, and delegates sizes <= 5
+to small sort. `--medium` is preserved at every disorder level; Adaptive uses
+Medium from 20% to below 50%. Complex and benchmark output remain future stages;
+inputs larger than five assigned to Complex currently produce no operations.
 Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -74,6 +92,13 @@ Run `python3 tests/test_simple.py` for Simple at sizes through 1000, selector
 behavior, shortest rotations, rank-only sorting, counters, ownership and memory
 checks. For example: `./push_swap --simple "6 3 1 5 2 4"`.
 
+Run `python3 tests/test_medium.py` for all permutations of sizes 2–6, patterns
+through 1500 elements, explicit/Adaptive routing, independent command replay,
+per-command invariants and allocation guards with ASan/UBSan. Add `--valgrind`
+to use Valgrind instead. The test also checks 100 random 100-element inputs
+below 1500 commands and 50 random 500-element inputs below 8000 commands.
+For example: `./push_swap --medium "6 3 1 5 2 4"`.
+
 CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
 one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
@@ -106,4 +131,6 @@ AI assistance implemented Stage 8 small sort, explained the maximum/minimum
 steps and added exhaustive permutations and command-stream regression tests.
 AI assistance implemented Stage 9 minimum extraction, shared rank search with
 small sort, and added arbitrary-size and selector regression tests.
+AI assistance implemented Stage 10 dynamic chunks and combined rotations,
+documented the command-count bound and added Medium regression tests.
 The learners should review and explain these changes before merging.

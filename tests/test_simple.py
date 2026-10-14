@@ -96,7 +96,8 @@ def main():
                                 capture_output=True, text=True)
         assert result.returncode == 0 and not result.stderr, result
         assert replay(low_disorder, result.stdout) == (sorted(low_disorder), []), result
-        for flag in ("--medium", "--complex"):
+        cli(low_disorder, "--medium")
+        for flag in ("--complex",):
             result = subprocess.run([str(ROOT / "push_swap"), flag, *map(str, low_disorder)],
                                     capture_output=True, text=True)
             assert (result.returncode, result.stdout, result.stderr) == (0, "", ""), result
