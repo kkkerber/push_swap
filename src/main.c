@@ -27,6 +27,8 @@ int	main(int argc, char **argv)
 		sort_simple(&data);
 	else if (data.effective_strategy == MEDIUM)
 		sort_medium(&data);
+	else if (data.effective_strategy == COMPLEX)
+		sort_complex(&data);
 	data_clear(&data);
 	return (0);
 }

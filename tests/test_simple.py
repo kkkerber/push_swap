@@ -97,10 +97,7 @@ def main():
         assert result.returncode == 0 and not result.stderr, result
         assert replay(low_disorder, result.stdout) == (sorted(low_disorder), []), result
         cli(low_disorder, "--medium")
-        for flag in ("--complex",):
-            result = subprocess.run([str(ROOT / "push_swap"), flag, *map(str, low_disorder)],
-                                    capture_output=True, text=True)
-            assert (result.returncode, result.stdout, result.stderr) == (0, "", ""), result
+        cli(low_disorder, "--complex")
         for values in ([], [0], [5, 4, 3, 2, 1, 0], cases[-1],
                        list(range(99, -1, -1)), list(range(999, -1, -1))):
             check(binary, values, memory=True)
