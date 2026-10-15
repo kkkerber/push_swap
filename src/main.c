@@ -21,6 +21,7 @@ int	main(int argc, char **argv)
 		return (error(&data));
 	compute_disorder(&data);
 	sort_dispatch(&data);
+	print_benchmark(&data);
 	data_clear(&data);
 	return (0);
 }
