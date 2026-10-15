@@ -162,6 +162,29 @@ Run `python3 tests/test_benchmark.py` for Stage 13 percentage rounding, selector
 metadata, independent command replay and counter comparison, output separation
 and ordering, zero-operation input, errors, and full-width counter formatting.
 
+Stage 15 load tests run with `python3 tests/test_performance.py --valgrind`.
+The full run uses 1000 reproducible seeds at n=100 and 500 at n=500 for each
+of Simple, Medium, Complex and Adaptive. An independent deque checker verifies
+sorted A and empty B before command counts are analyzed; benchmark counters
+are compared with the command stream. Stress cases cover 95, 501, 1000 and
+2048 elements with sorted, reverse, rotated, nearly sorted, alternating and
+random inputs. Default and explicit Adaptive output are compared on stress cases.
+Each command stream is also checked after expanding ss/rr/rrr into individual
+commands; rotation savings describe this equivalent stream, not a different
+sorting algorithm. Valgrind checks random stress cases, integer extremes and
+the saved worst cases under every selector.
+
+The measured summary and Simple limitations are documented in
+[docs/PERFORMANCE.md](docs/PERFORMANCE.md).
+Results and the three worst seeds per size/strategy are saved in
+`docs/performance_stage15.json`. Recheck them after changes with
+`python3 tests/test_performance.py --replay docs/performance_stage15.json --valgrind`.
+Use `--trials-100` and `--trials-500` for shorter exploratory runs and `--output`
+to keep their reports separate from the full results. Medium, Complex and
+Adaptive must remain below 1500/8000 commands on these random 100/500-element
+series. Explicit Simple is measured separately: its required minimum-extraction
+algorithm is quadratic and does not guarantee those performance targets.
+
 ## Resources
 
 - Team development plan: https://docs.google.com/document/d/1PUejcCwN77Q7NWbvMKPuRhWws-oXIzLYB7asaUVcJbo/edit
@@ -195,4 +218,6 @@ AI assistance implemented Stage 13 stderr benchmark formatting and added
 command-stream, counter, rounding and metadata regression checks.
 AI assistance completed Stage 14 main coordination and verified the integrated
 CLI, error cleanup and benchmark paths with existing regression suites.
+AI assistance added Stage 15 reproducible load tests, independent replay,
+worst-seed reports, equivalent combined-command comparisons and Valgrind checks.
 The learners should review and explain these changes before merging.
