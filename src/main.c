@@ -17,11 +17,14 @@ int	main(int argc, char **argv)
 	t_data	data;
 
 	data_init(&data);
+	if (argc == 1)
+		return (data_clear(&data), 0);
 	if (!parse_input(argc, argv, &data) || !assign_ranks(&data.a))
 		return (error(&data));
 	compute_disorder(&data);
 	sort_dispatch(&data);
-	print_benchmark(&data);
+	if (data.config.bench)
+		print_benchmark(&data);
 	data_clear(&data);
 	return (0);
 }

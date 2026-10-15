@@ -87,7 +87,11 @@ the effective strategy family's theoretical command complexity, total commands
 and all eleven counters. Small sort keeps the selected family in the report.
 Output uses write to stderr without allocation; stdout remains the same command
 stream as without --bench. Counters retain their full unsigned long long range.
-Invalid inputs print `Error` to stderr and return 1.
+Stage 14 completes main integration: initialize, return silently for no arguments,
+parse/validate and build A, assign ranks, measure original disorder, dispatch,
+print the optional benchmark, then clear memory. Parsing and validation remain
+inside the parser; main only coordinates modules. Failures use the shared error
+path to clear partial state, print `Error` to stderr and return 1.
 
 ## Instructions
 
@@ -189,4 +193,6 @@ AI assistance implemented Stage 12 Adaptive/dispatcher integration and added
 selector, threshold, metadata-preservation and direct API regression checks.
 AI assistance implemented Stage 13 stderr benchmark formatting and added
 command-stream, counter, rounding and metadata regression checks.
+AI assistance completed Stage 14 main coordination and verified the integrated
+CLI, error cleanup and benchmark paths with existing regression suites.
 The learners should review and explain these changes before merging.
