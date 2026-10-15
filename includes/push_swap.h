@@ -124,6 +124,10 @@ void	sort_complex(t_data *data);
 void	sort_adaptive(t_data *data);
 void	sort_dispatch(t_data *data);
 
+/* Benchmark: writes only to stderr when enabled, after sorting. */
+
+void	print_benchmark(const t_data *data);
+
 /* Push_swap commands */
 
 void	sa(t_data *data);

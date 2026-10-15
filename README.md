@@ -80,7 +80,13 @@ Requested strategy, original inversions and total pairs remain unchanged;
 the effective strategy identifies the selected family even when small sort
 handles the input. Both entry points require assigned dense ranks, empty B
 and previously computed disorder. They allocate no memory; a nonempty B is
-left untouched. Benchmark output (Stage 13) remains future work.
+left untouched.
+Stage 13 prints a benchmark after sorting when `--bench` is enabled. It reports
+original disorder rounded to two decimal places, requested/effective strategies,
+the effective strategy family's theoretical command complexity, total commands
+and all eleven counters. Small sort keeps the selected family in the report.
+Output uses write to stderr without allocation; stdout remains the same command
+stream as without --bench. Counters retain their full unsigned long long range.
 Invalid inputs print `Error` to stderr and return 1.
 
 ## Instructions
@@ -142,10 +148,15 @@ CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
 (`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
 one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
 one `--bench`. Flags occupy separate arguments and can appear before or after
-numbers. Strategy selection uses original-input disorder; benchmark output is
-not yet implemented.
+numbers. Strategy selection uses original-input disorder. For example:
+`./push_swap --adaptive --bench "6 3 1 5 2 4"`.
+Redirect commands and metrics separately with `> operations.txt 2> benchmark.txt`.
 Empty strings, whitespace-only arguments, malformed integers, overflow, numeric
 duplicates, unknown/repeated flags and flags without numbers are rejected.
+
+Run `python3 tests/test_benchmark.py` for Stage 13 percentage rounding, selector
+metadata, independent command replay and counter comparison, output separation
+and ordering, zero-operation input, errors, and full-width counter formatting.
 
 ## Resources
 
@@ -176,4 +187,6 @@ AI assistance implemented Stage 11 radix sorting and CLI integration, reused
 the Medium invariant probe and added exact-model and bit-boundary tests.
 AI assistance implemented Stage 12 Adaptive/dispatcher integration and added
 selector, threshold, metadata-preservation and direct API regression checks.
+AI assistance implemented Stage 13 stderr benchmark formatting and added
+command-stream, counter, rounding and metadata regression checks.
 The learners should review and explain these changes before merging.

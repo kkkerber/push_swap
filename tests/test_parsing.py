@@ -147,7 +147,11 @@ def check(binary, args, expected, *, memory=False, fail_at=None, app=False):
         assert (result.returncode, result.stdout, result.stderr) == (
             1, "", "Error\n"), (args, fail_at, result)
     else:
-        assert result.returncode == 0 and not result.stderr, (args, result)
+        assert result.returncode == 0, (args, result)
+        if app and "--bench" in args:
+            assert result.stderr.startswith("Disorder: "), (args, result)
+        else:
+            assert not result.stderr, (args, result)
         if app:
             values = expected[3:]
             from test_small import replay
@@ -220,6 +224,7 @@ def main():
     sources += sorted((ROOT / "src/analysis").glob("*.c"))
     sources += sorted((ROOT / "src/sorting").glob("*.c"))
     sources += sorted((ROOT / "src/operations").glob("*.c"))
+    sources += sorted((ROOT / "src/benchmark").glob("*.c"))
     sources += sorted((ROOT / "ft_printf").glob("*.c"))
     flags = ["cc", "-Wall", "-Wextra", "-Werror", "-g",
              "-I", str(ROOT / "includes"), "-I", str(ROOT / "ft_printf")]
