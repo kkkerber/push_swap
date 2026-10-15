@@ -4,220 +4,299 @@
 
 ## Description
 
-Stage 1/2 foundation and Stage 3/4 commands for Push_swap. Stacks are circular
-doubly linked lists with cached top, bottom and size. Traversals are bounded by size.
-Nodes start detached with rank -1. Taking a node transfers ownership to the
-caller; clearing a stack frees its nodes. Initialize data before using or
-clearing it, including after a partially completed stack construction.
+Push_swap generates commands that sort a stack of distinct C integers using a
+second stack and eleven allowed operations. The first input integer is the top
+of A; B starts empty. The result is ascending A (minimum on top) and empty B.
+This repository implements the mandatory part of subject version 1.1, with
+Simple, Medium, Complex and default Adaptive selectors.
 
-The public commands `sa`, `sb`, `ss`, `pa` and `pb` are implemented. Each
-command changes the stacks, prints its name immediately and updates its own
-counter and the total. No-ops print and count nothing. `ss` changes each eligible
-stack directly and prints/counts once. Push moves existing nodes without
-allocation or freeing. Stage 4 rotations (`ra`, `rb`, `rr`, `rra`, `rrb`, `rrr`)
-are also implemented with direct output and counters. Stage 5 parses and
-validates CLI arguments, then builds stack A in input order with B empty.
-Stage 6 assigns ranks after parsing: the minimum receives 0 and the maximum
-receives n - 1. It sorts a temporary copy using insertion sort, checks adjacent
-duplicates, then finds each node value in that copy. Values, node order and
-circular links stay unchanged. Ranking takes O(n²) time and O(n) temporary
-space; allocation failure or duplicates leave ranks untouched.
-Stage 7 counts original-input inversions and total pairs after ranking and before
-any operation. Adaptive selects Simple below 20%, Medium from 20% to below 50%,
-and Complex from 50%. Empty/singleton input has zero disorder. Explicit selectors
-are preserved; requested and effective strategies are stored separately.
-Threshold comparisons use integer ceilings without floating point or multiplying
-counters. Analysis takes O(n²) time and O(1) extra space.
-Stage 8 sorts inputs of up to five elements by rank using only public commands.
-For three nodes it moves the maximum to the bottom and swaps the first two if
-needed. For four/five it moves minima to B using shortest rotations, sorts three
-and returns the minima with pa. Already sorted input emits nothing.
-The small-sort API requires assigned ranks and empty B; unsupported sizes or a
-nonempty B are left untouched. Stage 9 implements Simple for arbitrary sizes:
-it finds the minimum rank, rotates it to the top by the shortest direction,
-pushes it to B and repeats, then restores all nodes with pa. Sizes up to five
-use the shared small sort. Simple uses O(n²) time/operations and O(1) extra space;
-it allocates/frees no nodes. `--simple` works at every disorder level. Adaptive
-uses it only below 20% disorder.
-Stage 10 implements Medium with rank chunks of width floor(sqrt(n)), computed
-using integer division. It selects the first remaining rank in the current
-chunk in forward circular order and brings that node to the top using the
-shortest rotation direction. Lower ranks in the chunk are rotated deeper into
-B; higher ranks stay near the top. Pending rb is combined with forward A
-rotation as rr. For two nodes in B, reverse rotation has the same effect as rb,
-so it combines with reverse A rotation as rrr. Returning nodes always brings
-the maximum rank in B to the top by the shortest direction before pa.
-
-For width w, extracting each chunk needs at most one forward sweep of A;
-reverse shortcuts cannot cost more than that sweep. Extraction therefore uses
-O(n²/w) commands. Each chunk forms two blocks around the older contents of B;
-its maxima can be reached from either end within O(w) rotations, giving O(nw)
-return commands. With w = floor(sqrt(n)), the command count is O(n√n).
-List searches can still take O(n²) CPU time; the subject measures complexity
-in generated commands. Medium needs O(1) extra space and no allocation/free.
-It requires dense assigned ranks 0..n-1 and empty B, and delegates sizes <= 5
-to small sort. `--medium` is preserved at every disorder level; Adaptive uses
-Medium from 20% to below 50%.
-
-Stage 11 implements Complex using binary LSD radix on ranks. The maximum rank
-determines the number of bit passes. Each pass processes exactly the initial
-size of A: zero bits move to B with pb, one bits rotate A with ra. Returning
-all of B with pa restores the order of the zero-bit group, so each pass is
-stable. The next pass sorts by the next more significant bit.
-For dense ranks 0..n-1, there are ceil(log2(n)) passes, each using at most 2n
-commands: O(n log n) time/commands and O(1) extra space for the sorting phase.
-Ranking and disorder preprocessing retain their separate O(n²) time costs.
-Complex allocates/frees no nodes, preserves values/ranks and delegates sizes
-up to five to small sort. Sorted input emits nothing. Explicit `--complex`
-always selects Complex; Adaptive selects it at disorder >= 50%.
-Stage 12 centralizes sorting in `sort_dispatch`, called by main after ranking
-and original-input disorder analysis. The dispatcher records the effective
-strategy before returning for empty or sorted input, delegates sizes <= 5 to
-small sort, and preserves explicit selectors. Adaptive calls `sort_adaptive`,
-which reuses Stage 7's integer threshold selection and runs the selected
-algorithm. Default input and explicit `--adaptive` follow the same path.
-Requested strategy, original inversions and total pairs remain unchanged;
-the effective strategy identifies the selected family even when small sort
-handles the input. Both entry points require assigned dense ranks, empty B
-and previously computed disorder. They allocate no memory; a nonempty B is
-left untouched.
-Stage 13 prints a benchmark after sorting when `--bench` is enabled. It reports
-original disorder rounded to two decimal places, requested/effective strategies,
-the effective strategy family's theoretical command complexity, total commands
-and all eleven counters. Small sort keeps the selected family in the report.
-Output uses write to stderr without allocation; stdout remains the same command
-stream as without --bench. Counters retain their full unsigned long long range.
-Stage 14 completes main integration: initialize, return silently for no arguments,
-parse/validate and build A, assign ranks, measure original disorder, dispatch,
-print the optional benchmark, then clear memory. Parsing and validation remain
-inside the parser; main only coordinates modules. Failures use the shared error
-path to clear partial state, print `Error` to stderr and return 1.
+The implementation uses circular doubly linked stacks, immutable ranks,
+original-input inversion analysis and direct public operations. The program
+writes commands to stdout, errors and optional benchmark metrics to stderr.
 
 ## Instructions
 
-Run `make` to build, then `./push_swap` for the empty lifecycle smoke check.
-Run `make clean`, `make fclean` or `make re` for build cleanup/rebuild.
-The existing ft_printf library is built and linked through its own Makefile.
-Run `python3 tests/test_foundation.py` for stack and lifecycle tests, including
-Valgrind memory checks. Run `python3 tests/test_operations.py` for Stage 3
-commands checked against an independent model, exact output/counters, circular
-links, ownership and unchanged values/ranks. The tests require Python 3, cc
-and Valgrind.
-Run `python3 tests/test_rotations.py` for Stage 4 checks with ASan/UBSan, or
-`python3 tests/test_rotations.py --valgrind` for Valgrind memory checks.
-Run `python3 tests/test_parsing.py` for Stage 5 parser, stack construction and
-main checks with ASan/UBSan, or add `--valgrind` for Valgrind checks. These tests
-also force failure of the values array, each allocation in a 16-node stack,
-and the ranking array used by main.
-Run `python3 tests/test_ranking.py` for Stage 6 ranks, integer boundaries,
-duplicate/allocation failure, unchanged nodes and links, UBSan and Valgrind.
+Build with a C compiler and Make:
 
-Run `python3 tests/test_analysis.py` for Stage 7 pair counts, exhaustive small
-permutations, exact thresholds, explicit selectors, mutation and memory checks.
+```sh
+make
+./push_swap 3 2 1
+./push_swap "3 2" 1
+./push_swap --medium "6 3 1 5 2 4"
+./push_swap --adaptive --bench "6 3 1 5 2 4"
+```
 
-Run `python3 tests/test_small.py` for all 152 permutations of sizes 2–5,
-per-command invariants, rank-only decisions, independent output replay and memory
-checks. Inputs up to five elements now emit sorting operations; all selectors
-share this small-sort base case.
+`make` uses `cc -Wall -Wextra -Werror`. The bundled `ft_printf` is built with
+its own Makefile and linked as `ft_printf/libftprintf.a`; no external library
+installation is needed. Its `ft_printf` prints operation names immediately.
+Header dependencies are tracked and an unchanged `make` does not relink.
+`make clean` removes objects, `make fclean` also removes the executable/library,
+and `make re` rebuilds everything.
 
-Run `python3 tests/test_simple.py` for Simple at sizes through 1000, selector
-behavior, shortest rotations, rank-only sorting, counters, ownership and memory
-checks. For example: `./push_swap --simple "6 3 1 5 2 4"`.
+Input can mix separate arguments and whitespace-separated quoted strings.
+Each token must be an optional single sign followed by decimal digits, within
+`INT_MIN..INT_MAX`. Numeric duplicates are rejected (`3`/`03`, `0`/`-0`,
+`5`/`+5`). Negative integers are numbers. Flags match whole arguments exactly
+and can precede or follow numbers.
 
-Run `python3 tests/test_medium.py` for all permutations of sizes 2–6, patterns
-through 1500 elements, explicit/Adaptive routing, independent command replay,
-per-command invariants and allocation guards with ASan/UBSan. Add `--valgrind`
-to use Valgrind instead. The test also checks 100 random 100-element inputs
-below 1500 commands and 50 random 500-element inputs below 8000 commands.
-For example: `./push_swap --medium "6 3 1 5 2 4"`.
+| Option | Behavior |
+| --- | --- |
+| `--simple` | Minimum extraction at every disorder level |
+| `--medium` | Dynamic rank chunks at every disorder level |
+| `--complex` | Binary LSD radix at every disorder level |
+| `--adaptive` | Choose a family from original disorder; default |
+| `--bench` | Print metrics after sorting to stderr |
 
-Run `python3 tests/test_complex.py` for all permutations of sizes 0–6, exact
-radix command sequences, power-of-two boundaries, patterns through 1500,
-rank-only decisions, per-command links/ownership/counters and allocation guards
-with ASan/UBSan. Add `--valgrind` to use Valgrind instead. A standalone probe
-also checks sparse nonnegative ranks through INT_MAX to verify dynamic bit
-counting. The CLI still assigns dense ranks. Twenty random inputs at each of
-100 and 500 elements use 1084 and 6784 commands respectively.
-For example: `./push_swap --complex "6 3 1 5 2 4"`.
+At most one selector and one `--bench` are accepted. Unknown/repeated flags,
+flags without numbers, empty/whitespace-only arguments, malformed integers,
+overflow and duplicates return status 1 with exactly `Error\n` on stderr and
+no stdout. No arguments return status 0 without output. Valid sorted input
+emits no commands; with `--bench`, it still reports metrics.
 
-Run `python3 tests/test_dispatch.py` for Stage 12 selector routing, exact
-20%/50% boundaries and adjacent inversion counts, all permutations of sizes
-0–5 under every selector, and patterns through 1000 elements. Direct API
-checks preserve requested/effective strategies, original metrics, node
-identity, ranks, circular links and operation counters, including repeated
-sorting and nonempty-B guards. The suite uses ASan/UBSan by default; add
-`--valgrind` for Valgrind checks.
+### Benchmark
 
-CLI accepts separate integers (`./push_swap 3 2 1`), quoted strings
-(`./push_swap "3 2 1"`) and mixed input (`./push_swap "3 2" 1`). Select at most
-one of `--simple`, `--medium`, `--complex`, `--adaptive` (default), plus at most
-one `--bench`. Flags occupy separate arguments and can appear before or after
-numbers. Strategy selection uses original-input disorder. For example:
-`./push_swap --adaptive --bench "6 3 1 5 2 4"`.
-Redirect commands and metrics separately with `> operations.txt 2> benchmark.txt`.
-Empty strings, whitespace-only arguments, malformed integers, overflow, numeric
-duplicates, unknown/repeated flags and flags without numbers are rejected.
+```sh
+./push_swap --adaptive --bench "6 3 1 5 2 4" > operations.txt 2> benchmark.txt
+```
 
-Run `python3 tests/test_benchmark.py` for Stage 13 percentage rounding, selector
-metadata, independent command replay and counter comparison, output separation
-and ordering, zero-operation input, errors, and full-width counter formatting.
+The report contains original disorder rounded to two decimal places,
+requested and effective strategy, the effective family's theoretical command
+complexity, total operations and all eleven counters. For this example,
+disorder is `60.00%`, requested strategy is Adaptive and effective is Complex.
+The three complexity labels are `O(n^2)`, `O(n*sqrt(n))` and `O(n log n)`.
+For size <= 5, metrics retain the selected family although small sort runs.
+The counter sum equals the total; a combined command counts once. Formatting
+uses `write(2, ...)`, supports unsigned long long counters and allocates no
+memory. The command stream is identical with and without `--bench`.
 
-Stage 15 load tests run with `python3 tests/test_performance.py --valgrind`.
-The full run uses 1000 reproducible seeds at n=100 and 500 at n=500 for each
-of Simple, Medium, Complex and Adaptive. An independent deque checker verifies
-sorted A and empty B before command counts are analyzed; benchmark counters
-are compared with the command stream. Stress cases cover 95, 501, 1000 and
-2048 elements with sorted, reverse, rotated, nearly sorted, alternating and
-random inputs. Default and explicit Adaptive output are compared on stress cases.
-Each command stream is also checked after expanding ss/rr/rrr into individual
-commands; rotation savings describe this equivalent stream, not a different
-sorting algorithm. Valgrind checks random stress cases, integer extremes and
-the saved worst cases under every selector.
+## Data structures and ownership
 
-The measured summary and Simple limitations are documented in
-[docs/PERFORMANCE.md](docs/PERFORMANCE.md).
-Results and the three worst seeds per size/strategy are saved in
-`docs/performance_stage15.json`. Recheck them after changes with
-`python3 tests/test_performance.py --replay docs/performance_stage15.json --valgrind`.
-Use `--trials-100` and `--trials-500` for shorter exploratory runs and `--output`
-to keep their reports separate from the full results. Medium, Complex and
-Adaptive must remain below 1500/8000 commands on these random 100/500-element
-series. Explicit Simple is measured separately: its required minimum-extraction
-algorithm is quadratic and does not guarantee those performance targets.
+`t_node` holds `value`, `rank`, `prev` and `next`; `t_stack` holds `top`,
+`bottom` and `size`. Empty stacks have null endpoints and size 0. A singleton
+points to itself. Otherwise `top->prev == bottom` and `bottom->next == top`.
+Every node satisfies `next->prev == node` and `prev->next == node`.
+Traversals are bounded by size because the links never reach NULL.
+
+Nodes are allocated once. `stack_take_top` detaches without freeing and resets
+both links to NULL. `pa`/`pb` move those same nodes without allocation/free.
+`stack_clear` frees exactly the original size and resets both endpoints/size;
+cleanup also handles empty and partially constructed states.
+
+### Operations
+
+| Command | Effect |
+| --- | --- |
+| `sa` | Swap the first two nodes of A |
+| `sb` | Swap the first two nodes of B |
+| `ss` | Swap the first two nodes of each eligible stack |
+| `pa` | Move B's top node to A's top |
+| `pb` | Move A's top node to B's top |
+| `ra` | Move A's top to its bottom |
+| `rb` | Move B's top to its bottom |
+| `rr` | Rotate both stacks forward |
+| `rra` | Move A's bottom to its top |
+| `rrb` | Move B's bottom to its top |
+| `rrr` | Reverse rotate both stacks |
+
+Each public operation checks eligibility, mutates the stack, prints its own
+name and updates its counter/total. No-ops print/count nothing. Combined
+operations modify each eligible stack directly and print/count once if either
+changes; they never call their public single-stack counterparts. Rotations
+only move the cached endpoints through circular links.
+
+## Ranking, disorder and routing
+
+After CLI validation, A is built in input order. Ranking sorts a temporary
+value copy with insertion sort, checks adjacent duplicates defensively and
+assigns each node its index in that copy. For input `[42, -7, 0]`, ranks are
+`[2, 0, 1]`. Values and node order stay unchanged. Minimum rank is 0 and maximum
+is n-1. Rank is fixed across operations and differs from current stack position.
+The temporary array is freed; ranking failure leaves ranks unassigned.
+
+Before any operation, analysis stores inversions and total pairs:
+
+```text
+inversions = number of pairs i < j with value[i] > value[j]
+pairs = n * (n - 1) / 2
+disorder = inversions / pairs   (0 for n < 2)
+```
+
+Adaptive compares integer counts with ceiling thresholds, avoiding division
+by zero, floating-point boundary decisions and multiplication of counters.
+
+| Original disorder | Effective family | Command complexity |
+| --- | --- | --- |
+| `< 0.2` | Simple | O(n²) |
+| `>= 0.2` and `< 0.5` | Medium | O(n√n) |
+| `>= 0.5` | Complex | O(n log n) |
+
+The dispatcher records the effective family, skips sorted input, uses shared
+small sort for size <= 5, then runs the selected algorithm. Explicit selectors
+are preserved. Original metrics and requested strategy stay unchanged.
+`main` only coordinates initialization, empty execution, parsing/validation,
+ranking, disorder, dispatch, optional benchmark and cleanup.
+
+## Algorithms and complexity arguments
+
+The subject's complexity model counts generated Push_swap commands. CPU time
+and preprocessing are separate: CLI duplicate validation, ranking and disorder
+each take O(n²) time. Ranking needs O(n) temporary storage; the stacks themselves
+use O(n) nodes. Sorting allocates no nodes and uses O(1) extra storage.
+
+### Small sort
+
+Zero/one element requires nothing; two use `sa` only if needed. For three,
+move the maximum to the bottom with `ra` or `rra`, then swap the first two
+if needed. For four/five, extract minimum ranks to B by shortest rotations,
+sort three and restore with `pa`. Minima return in ascending order. All 152
+permutations for sizes 2–5 are tested. These fixed cases take O(1) commands.
+
+### Simple: minimum extraction
+
+Find A's minimum rank, rotate it to the top by the shorter direction and `pb`.
+Repeat until A is empty, then restore everything with `pa`. Extracted minima
+accumulate in descending order in B, so restoring them produces ascending A.
+At remaining size k, extraction costs at most floor(k/2) rotations and a push;
+summing over k gives O(n²) commands. Minimum searches also take O(n²) CPU time.
+This strategy is straightforward to explain and implements the required
+quadratic family; low inversion count does not guarantee a small command count.
+
+### Medium: dynamic chunks
+
+Use chunk width w = floor(sqrt(n)), computed dynamically with integer division.
+For each rank interval, select the first eligible node in forward circular
+order and bring that node to the top by the shortest direction. Push it to B;
+lower ranks are buried with a pending `rb`, while higher ranks stay near the
+top. Combine that pending rotation with a forward A rotation using direct `rr`.
+For a two-node B, `rrb` has the same effect as `rb`, allowing direct `rrr` with
+a reverse A rotation. Restore by moving B's maximum to the top via the shorter
+direction, then `pa`.
+
+Extracting a chunk needs at most a forward sweep of A; reverse shortcuts cost
+no more than that sweep. Across chunks this gives O(n²/w) commands. Each chunk
+forms two blocks around older B contents; successive maxima are accessible
+within O(w) rotations, giving O(nw) restoration commands. Taking w ≈ √n yields
+O(n√n). Linked-list searches can still require O(n²) CPU time. The width works
+for arbitrary valid input sizes and uses no 100/500-specific cases.
+
+### Complex: binary LSD radix
+
+Compute the bit count from the maximum rank. For each bit, process exactly
+the pass's original A size: zero goes to B with `pb`, one stays in A through
+`ra`. Return all B with `pa`. Rotating the ones preserves their order, and
+the two transfers reverse the zero group twice, preserving its order too.
+After each stable pass, ranks are sorted by all bits processed so far.
+After all bits, ranks and therefore values are sorted.
+
+Dense ranks need ceil(log2(n)) passes, each with at most 2n commands, giving
+O(n log n) sorting commands/time. This avoids sign handling and dependence on
+raw integer magnitude. The complete program retains O(n²) preprocessing time.
+
+### Adaptive and measured limits
+
+Adaptive follows the prescribed disorder thresholds above, sharing the same
+algorithms and small sort. It does not promise the fewest commands on each
+input. Stage 15 ran 1000 random inputs of size 100 and 500 of size 500 per
+selector, with independent command replay before counting.
+
+| Strategy | Maximum at 100 | Maximum at 500 |
+| --- | ---: | ---: |
+| Simple | 1724 | 35503 |
+| Medium | 800 | 7609 |
+| Complex | 1084 | 6784 |
+| Adaptive | 1084 | 7555 |
+
+Medium, Complex and Adaptive met internal random-series targets (<1500/<8000).
+Explicit Simple exceeds those budgets and the mandatory 500-element budget
+in these samples. Measurements do not prove bounds for all permutations.
+See [performance analysis](docs/PERFORMANCE.md) and the
+[full report with worst seeds](docs/performance_stage15.json).
+
+## Testing
+
+Test tools: Python 3, `cc`, Valgrind, Norminette and compiler sanitizer support.
+The Python checker replays commands independently; no official checker binary
+is bundled. Probes build in temporary directories. Run tests from the root:
+
+```sh
+make
+python3 tests/test_benchmark.py
+python3 tests/test_performance.py --replay docs/performance_stage15.json --valgrind
+norminette src includes ft_printf
+```
+
+| Test file in `tests/` | Coverage |
+| --- | --- |
+| `test_foundation.py` | Lifecycle, stack invariants, ownership, memory |
+| `test_operations.py` | Swap/push, no-ops, direct combinations, output/counters |
+| `test_rotations.py` | All rotations, links, combined counts |
+| `test_parsing.py` | CLI cases, boundaries, partial construction/allocation failures |
+| `test_ranking.py` | Dense ranks, unchanged values/links, duplicate/allocation failures |
+| `test_analysis.py` | Inversions, exact 20%/50% boundaries, selectors |
+| `test_small.py` | All permutations of sizes 2–5, rank-based decisions |
+| `test_simple.py` | Minimum extraction, arbitrary sizes, ownership/counters |
+| `test_medium.py` | Dynamic chunks, combined rotations, random operation budgets |
+| `test_complex.py` | Stable radix model, bit boundaries, sizes through 1500 |
+| `test_dispatch.py` | All selectors, metadata, sorted input and small-sort routing |
+| `test_benchmark.py` | Rounding, all counters, stream isolation/order, 64-bit output |
+| `test_performance.py` | 6000 random runs, stress to 2048, worst seeds, replay |
+
+Run an individual suite with `python3 tests/<file>.py`. Rotations, parsing,
+Medium, Complex and dispatcher accept `--valgrind` instead of their default
+ASan/UBSan mode. Other suites include their own memory probes. If LeakSanitizer
+cannot run under the environment's process tracing, use
+`ASAN_OPTIONS=detect_leaks=0 python3 tests/<file>.py` for ASan/UBSan and run
+Valgrind separately for leaks; disabling leak detection is not a leak check.
+
+Full performance reproduction:
+
+```sh
+python3 tests/test_performance.py --valgrind
+```
+
+This writes `docs/performance_stage15.json` after all checks pass. For smaller
+exploratory samples, set `--trials-100`, `--trials-500` and a separate `--output`.
+Every random stream is also checked with combined commands expanded into
+individual operations; recorded rotation savings refer to that equivalent
+stream. Valgrind covers saved worst cases and representative stress inputs.
+
+## Contributions
+
+The git history records the following module work under the contributors'
+author identities; it does not by itself establish individual understanding.
+
+| Contributor | Work recorded in the repository |
+| --- | --- |
+| maliuten (mmmaryl / Mariia identities) | Stack foundation/lifecycle, swap/push, ranking, disorder, small sort, Simple, benchmark, main integration, performance tests and merges |
+| vakhapil (kerber / Valeriia identities) | Parser and CLI integration, rotations, Medium, Complex, Adaptive/dispatcher, associated tests and documentation |
+
+Both learners must review, understand and be able to modify every module and
+attend defense. [Defense preparation](docs/DEFENSE.md) contains walkthroughs,
+questions and practical exercises; personal readiness must be verified by the
+learners, not inferred from passing tests or this documentation.
+
+## AI usage
+
+AI assistance was used to implement and test lifecycle/stack corrections,
+operations, CLI integration, ranking, disorder, all sorting families, dispatcher,
+benchmark and main integration. The parser integration reused the standalone
+parser from `origin/feature/parsing` (`ffdc674`). Assistance also produced
+regression probes, independent replay checks, allocation-failure tests,
+performance reports, algorithm explanations and this final documentation.
+The bundled ft_printf and existing stack/parser work were reused.
+
+AI-generated changes require learner review and explanation. Test results
+support correctness on tested cases; they do not replace the complexity
+arguments, understanding of ownership or the ability to make a defense change.
 
 ## Resources
 
-- Team development plan: https://docs.google.com/document/d/1PUejcCwN77Q7NWbvMKPuRhWws-oXIzLYB7asaUVcJbo/edit
-- `man 3 malloc`, `man 3 free`, `man 2 write`.
-
-## Contributions and AI usage
-
-The repository history records contributions by both learners. Existing stack
-code was retained; AI assistance helped prepare the Stage 1/2 lifecycle,
-correct singleton extraction, normalize formatting and add regression tests.
-AI assistance also implemented and tested the Stage 3 commands using the
-existing stack primitives and direct per-command output/counters.
-Stage 5 reuses the standalone parser from `origin/feature/parsing` (`ffdc674`);
-AI assistance adapted its configuration types, integrated stack construction
-and added portable allocation-failure and CLI regression checks.
-AI assistance implemented Stage 6 ranking, explained the temporary-array
-approach and added rank, ownership and allocation-failure regression tests.
-AI assistance implemented Stage 7 inversion counting and integer strategy
-selection, explained the thresholds and added independent-model tests.
-AI assistance implemented Stage 8 small sort, explained the maximum/minimum
-steps and added exhaustive permutations and command-stream regression tests.
-AI assistance implemented Stage 9 minimum extraction, shared rank search with
-small sort, and added arbitrary-size and selector regression tests.
-AI assistance implemented Stage 10 dynamic chunks and combined rotations,
-documented the command-count bound and added Medium regression tests.
-AI assistance implemented Stage 11 radix sorting and CLI integration, reused
-the Medium invariant probe and added exact-model and bit-boundary tests.
-AI assistance implemented Stage 12 Adaptive/dispatcher integration and added
-selector, threshold, metadata-preservation and direct API regression checks.
-AI assistance implemented Stage 13 stderr benchmark formatting and added
-command-stream, counter, rounding and metadata regression checks.
-AI assistance completed Stage 14 main coordination and verified the integrated
-CLI, error cleanup and benchmark paths with existing regression suites.
-AI assistance added Stage 15 reproducible load tests, independent replay,
-worst-seed reports, equivalent combined-command comparisons and Valgrind checks.
-The learners should review and explain these changes before merging.
+- [Project plan](docs/PROJECT_PLAN.md): architecture, stages and requirements.
+- [Subject notes](docs/SUBJECT_NOTES.md): repository summary of subject v1.1;
+  the official subject takes priority in any conflict.
+- [Performance analysis](docs/PERFORMANCE.md): measured counts, limitations,
+  replay commands and combined-rotation comparison.
+- [Defense preparation](docs/DEFENSE.md): source map, traces and practice tasks.
+- Local manuals: `man 3 malloc`, `man 3 free`, `man 2 write`.
+- Team development plan (shared reference):
+  https://docs.google.com/document/d/1PUejcCwN77Q7NWbvMKPuRhWws-oXIzLYB7asaUVcJbo/edit
