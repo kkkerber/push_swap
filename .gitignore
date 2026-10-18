@@ -5,3 +5,6 @@ push_swap
 .DS_Store
 .vscode/
 __pycache__/
+
+# Local third-party tester and its generated reports
+/tools/Push-Swap-Tester/

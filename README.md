@@ -209,8 +209,6 @@ selector, with independent command replay before counting.
 Medium, Complex and Adaptive met internal random-series targets (<1500/<8000).
 Explicit Simple exceeds those budgets and the mandatory 500-element budget
 in these samples. Measurements do not prove bounds for all permutations.
-See [performance analysis](docs/PERFORMANCE.md) and the
-[full report with worst seeds](docs/performance_stage15.json).
 
 ## Testing
 
@@ -248,6 +246,23 @@ cannot run under the environment's process tracing, use
 `ASAN_OPTIONS=detect_leaks=0 python3 tests/<file>.py` for ASan/UBSan and run
 Valgrind separately for leaks; disabling leak detection is not a leak check.
 
+An optional third-party Linux tester is available from
+[gemartin99/Push-Swap-Tester](https://github.com/gemartin99/Push-Swap-Tester).
+Keep its download local (the directory is ignored by Git):
+
+```sh
+git clone https://github.com/gemartin99/Push-Swap-Tester.git tools/Push-Swap-Tester
+bash tests/run_external_tester.sh 200 200
+```
+
+The launcher builds the project and runs the upstream mandatory suite from its
+own directory, where `traces.txt` is written. Valgrind is required. Its older
+performance scores differ from subject 1.2: a performance `KO` can accompany a
+correct checker result and a count that meets this subject's thresholds.
+Its memory checks do not use Valgrind's `--error-exitcode`, so use the project's
+memory tests for reliable leak checks. Bonus mode requires a learner-written
+`checker`, which this mandatory-only project does not provide.
+
 Full performance reproduction:
 
 ```sh
@@ -270,33 +285,17 @@ author identities; it does not by itself establish individual understanding.
 | maliuten (mmmaryl / Mariia identities) | Stack foundation/lifecycle, swap/push, ranking, disorder, small sort, Simple, benchmark, main integration, performance tests and merges |
 | vakhapil (kerber / Valeriia identities) | Parser and CLI integration, rotations, Medium, Complex, Adaptive/dispatcher, associated tests and documentation |
 
-Both learners must review, understand and be able to modify every module and
-attend defense. [Defense preparation](docs/DEFENSE.md) contains walkthroughs,
-questions and practical exercises; personal readiness must be verified by the
-learners, not inferred from passing tests or this documentation.
-
-## AI usage
-
-AI assistance was used to implement and test lifecycle/stack corrections,
-operations, CLI integration, ranking, disorder, all sorting families, dispatcher,
-benchmark and main integration. The parser integration reused the standalone
-parser from `origin/feature/parsing` (`ffdc674`). Assistance also produced
-regression probes, independent replay checks, allocation-failure tests,
-performance reports, algorithm explanations and this final documentation.
-The bundled ft_printf and existing stack/parser work were reused.
-
-AI-generated changes require learner review and explanation. Test results
-support correctness on tested cases; they do not replace the complexity
-arguments, understanding of ownership or the ability to make a defense change.
+Both learners must understand and be able to modify every module and attend
+the defense.
 
 ## Resources
 
-- [Project plan](docs/PROJECT_PLAN.md): architecture, stages and requirements.
-- [Subject notes](docs/SUBJECT_NOTES.md): repository summary of subject v1.1;
-  the official subject takes priority in any conflict.
-- [Performance analysis](docs/PERFORMANCE.md): measured counts, limitations,
-  replay commands and combined-rotation comparison.
-- [Defense preparation](docs/DEFENSE.md): source map, traces and practice tasks.
+- Official Push_swap subject: project requirements, allowed operations,
+  strategy complexities, disorder thresholds and evaluation criteria.
 - Local manuals: `man 3 malloc`, `man 3 free`, `man 2 write`.
-- Team development plan (shared reference):
-  https://docs.google.com/document/d/1PUejcCwN77Q7NWbvMKPuRhWws-oXIzLYB7asaUVcJbo/edit
+
+## AI usage
+
+AI was used to help write this README, understand the subject and all its requirements, and explain how the project and individual functions work. AI also assisted with testing across project modules, as well as performance analysis.
+
+The project authors are maliuten and vakhapil, who are responsible for the whole project, inluding implementation, algorithm choices, testing, error checks and corrections, and submitted code.
